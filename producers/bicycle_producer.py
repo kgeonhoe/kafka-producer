@@ -1,9 +1,11 @@
-import time
 import json
 import logging
-from confluent_kafka import Producer
-from apis.seoul_data.realtime_bicycle import RealtimeBicycle
+import time
 from datetime import datetime
+
+from confluent_kafka import Producer
+
+from apis.seoul_data.realtime_bicycle import RealtimeBicycle
 
 BROKER_LST = "kafka01:9092,kafka02:9092,kafka03:9092"
 
@@ -12,7 +14,9 @@ class BicycleProducer:
 
     def __init__(self, topic):
         self.topic = topic
-        self.conf = {"bootstrap.servers": BROKER_LST}
+        self.conf = {"bootstrap.servers": BROKER_LST,
+                    'compression.type':'lz4'
+                     }
         self.producer = Producer(self.conf)
         self._set_logger()
 
@@ -50,7 +54,7 @@ class BicycleProducer:
 
                 # 컬럼 추가
                 item["CRT_DTTM"] = now_dt
-                    
+
                 # produce
                 try:
                     self.producer.produce(
